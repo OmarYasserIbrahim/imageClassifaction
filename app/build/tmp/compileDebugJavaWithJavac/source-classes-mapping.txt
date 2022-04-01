@@ -1,0 +1,10 @@
+com/example/imageclassification/BuildConfig.java
+ com.example.imageclassification.BuildConfig
+com/example/imageclassification/imageclassification/Classifier.java
+ com.example.imageclassification.imageclassification.Classifier
+ com.example.imageclassification.imageclassification.Classifier$1
+ com.example.imageclassification.imageclassification.Classifier$Recognition
+com/example/imageclassification/MainActivity.java
+ com.example.imageclassification.MainActivity
+ com.example.imageclassification.MainActivity$1
+ com.example.imageclassification.MainActivity$2

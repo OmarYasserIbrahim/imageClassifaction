@@ -19,8 +19,13 @@ import android.widget.ImageView;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.List;
+
 import android.util.Log;
 import android.database.Cursor;
+import android.widget.TextView;
+
+import com.example.imageclassification.imageclassification.Classifier;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_CODE = 321;
     ImageView frame,innerImage;
     private Uri image_uri;
+    Classifier classifier;
+    TextView resultTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         frame = findViewById(R.id.imageView);
         innerImage = findViewById(R.id.imageView2);
+        resultTv=findViewById(R.id.textView);
 
         frame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permission, PERMISSION_CODE);
         }
+        classifier=new Classifier(getAssets(),"mobilenet_v1_1.0_224.tflite","mobilenet_v1_1.0_224.txt",224);
     }
 
     private void openCamera() {
@@ -93,17 +102,27 @@ public class MainActivity extends AppCompatActivity {
             //innerImage.setImageURI(image_uri);
             Bitmap bitmap = uriToBitmap(image_uri);
             innerImage.setImageBitmap(bitmap);
+            doInference(bitmap);
         }
 
         if (requestCode == IMAGE_CAPTURE_CODE && resultCode == RESULT_OK){
             //innerImage.setImageURI(image_uri);
             Bitmap bitmap = uriToBitmap(image_uri);
             innerImage.setImageBitmap(bitmap);
+            doInference(bitmap);
         }
 
     }
-
-    //TODO rotate image if image captured on sumsong devices
+    void doInference(Bitmap input){
+        Bitmap rotated=rotateBitmap(input);
+        List<Classifier.Recognition>results= classifier.recognizeImage(rotated);
+        resultTv.setText("");
+        for (int i=0;i<results.size();i++){
+            Classifier.Recognition recognition=results.get(i);
+            resultTv.append(recognition.title+"  "+ recognition.confidence+"\n");
+        }
+    }
+    //TODO rotate image if image captured on samsung devices
     //Most phone cameras are landscape, meaning if you take the photo in portrait, the resulting photos will be rotated 90 degrees.
     public Bitmap rotateBitmap(Bitmap input){
         String[] orientationColumn = {MediaStore.Images.Media.ORIENTATION};
